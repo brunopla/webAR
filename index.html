@@ -2,31 +2,146 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Marcador personalizado con A-Frame</title>
-    <meta name="viewport" content="width=device-width, initial-scale=0.1" />
+    <title>AR.js Test</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/3d-model-viewer/dist/model-viewer.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://rawcdn.githack.com/AR-js-org/AR.js/3.3.0/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate"></script>
+    <script src="https://unpkg.com/@pwabuilder/pwainstall"></script>
+    <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
   </head>
-  <body>
-    <a-scene
-      vr-mode-ui="enabled: false"
-      embedded
-      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; resetOnStop: true;"
-    >
-      <a-marker
-        type="barcode"
-        url="KyonTracker/Kyon/kyon.png"
-       
+  <body style="margin: 0px; overflow: hidden">
+    <div style="display: flex; justify-content: center">
+      <style>
+        button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          margin: 0;
+          padding: 100;
+        }
+        button img {
+          max-width: 50px;
+          height: auto;
+          border: none;
+          outline: none;
+        }
+      </style>
+
+      <button
+        onclick="location.href='https://www.google.com'; event.stopPropagation();"
       >
+        <img
+          src="https://cdn.glitch.global/a2cd5256-0f90-4e3d-b74c-a2db428a4e78/google-logo-vector-graphic-pixabay-15.png?v=1678711773137"
+          alt="Google"
+        />
+      </button>
+      <button
+        onclick="location.href='https://www.youtube.com'; event.stopPropagation();"
+      >
+        <img
+          src="https://cdn.glitch.global/a2cd5256-0f90-4e3d-b74c-a2db428a4e78/pngegg%20(2).png?v=1678712383638"
+          alt="Botón 2"
+        />
+      </button>
+      <button
+        onclick="location.href='https://www.linkedin.com'; event.stopPropagation();"
+      >
+        <img
+          src="https://cdn.glitch.global/a2cd5256-0f90-4e3d-b74c-a2db428a4e78/JPEG-05.jpg?v=1677864898970"
+          alt="Botón 3"
+        />
+      </button>
+
+      <button onclick="activarAnimacion()">Activar Animación</button>
+    </div>
+    <a-scene embedded vr-mode-ui="enabled: false" arjs>
+      <a-marker preset="hiro">
+        <a-video
+          id="videoPlane"
+          position="0 0 -4"
+          rotation="0 0 0"
+          width="2"
+          height="2"
+          autoplay
+          loop
+          muted
+        ></a-video>
         <a-entity
-          position="0 0 0" 
-          rotation="0 45 0"
-          geometry="primitive: box"
-          material="color: red"
-          scale="0.1 0.1 0.1" 
+          id="miModelo3D"
+          gltf-model="https://cdn.glitch.global/a2cd5256-0f90-4e3d-b74c-a2db428a4e78/CasaKyon.glb?v=1678480408284"
+          position="0 0 0"
+          scale="0.4 0.4 0.4"
+          rotation="0 0 0"
+          visible="false"
         ></a-entity>
+        <script>
+          function activarAnimacion() {
+            var modelo3D = document.getElementById("miModelo3D");
+            modelo3D.setAttribute("animation-mixer", "");
+            modelo3D.setAttribute("visible", true);
+          }
+        </script>
+        <a-entity
+          light="type: ambient; color: #FFF; intensity: 1; distance: 20;"
+        ></a-entity>
+        <a-entity>
+          <a-light position="0 1 0" intensity="1" color="white"></a-light>
+          <a-light position="0 0 1" intensity="1" color="white"></a-light>
+        </a-entity>
       </a-marker>
-      <a-entity camera="fov: 60;"></a-entity>
+      <a-entity camera raycaster></a-entity>
     </a-scene>
+
+    <script>
+      const videoPlane = document.querySelector("#videoPlane");
+      const videoSources = [
+        "https://cdn.glitch.me/a2cd5256-0f90-4e3d-b74c-a2db428a4e78/y2mate.com%20-%20La%20MUERTE%20De%20HANGE%20Y%20El%20RETUMBAR%20%20Shingeki%20No%20Kyojin%20The%20FINAL%20SEASON%20Parte%203%20SUB%20ESPA%C3%91OL%20Cap%201_480p.mp4?v=1678108084331",
+        "https://cdn.glitch.me/a2cd5256-0f90-4e3d-b74c-a2db428a4e78/Levi%20vs%20Titan%20bestia%20HD_%20Pelea%20completa%20_%20Sub%20espa%C3%B1ol%20_%20Shingeki%20no%20kyojin%20temporada%203%20parte%202%20cap%205.mp4?v=1678195679255",
+      ];
+      let currentVideoIndex = 0;
+
+      function setVideo() {
+        // pausa el video anterior y establece el src a una cadena vacía para detener el audio
+        const previousVideo = document.querySelector("#videoPlane[src]");
+        if (previousVideo) {
+          previousVideo.pause();
+          previousVideo.removeAttribute("src");
+          previousVideo.load();
+          previousVideo.removeAttribute("autoplay");
+        }
+        // establece la nueva fuente de video y reproduce el video
+        videoPlane.setAttribute("src", videoSources[currentVideoIndex]);
+        videoPlane.play();
+        videoPlane.currentTime = 0;
+      }
+
+      function swapVideo() {
+        const videoTime = videoPlane.currentTime;
+        if (videoTime <= 0.5) {
+          currentVideoIndex =
+            (currentVideoIndex - 1 + videoSources.length) % videoSources.length;
+        } else {
+          currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+        }
+        setVideo();
+      }
+
+      const buttonContainer = document.querySelector("#buttonContainer");
+      buttonContainer.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!event.target.closest("#buttonContainer")) {
+          swapVideo();
+        }
+      });
+    </script>
   </body>
 </html>
